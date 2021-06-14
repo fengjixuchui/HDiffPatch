@@ -26,6 +26,8 @@
  OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#pragma warning( disable : 4706)
+
 #ifndef compress_detect_h
 #define compress_detect_h
 #include <stddef.h> //for size_t
@@ -75,6 +77,7 @@ private:
     int             m_lastPopChar;
     hpatch_uint32_t m_cacheBegin;
     hpatch_uint32_t m_cacheEnd;
+    void clear();
     void _add_rle(const unsigned char* d,size_t n);
     size_t _cost_rle(const unsigned char* d,size_t n)const;
 };

@@ -34,9 +34,14 @@
 #       //define PTW32_STATIC_LIB  //for static pthread lib
 #   endif
 #   include <pthread.h>
+#   ifdef __ANDROID__
+#       include <sched.h> // sched_yield()
+#   endif
 #endif
 #if (_IS_USED_CPP11THREAD)
 #   include <thread>
+#   include <mutex>
+#   include <condition_variable>
 #endif
 #if (_IS_USED_WIN32THREAD)
 #   include "windows.h"
@@ -136,7 +141,11 @@ void this_thread_yield(){
 #   ifdef WIN32
     Sleep(0);
 #   else
-    pthread_yield();
+#       ifdef __ANDROID__
+            sched_yield();
+#       else
+            pthread_yield();
+#       endif
 #   endif
 #endif
 }
@@ -349,6 +358,8 @@ void thread_parallel(int threadCount,TThreadRunCallBackProc threadProc,void* wor
             if (rt==0){
                 delete pt;
                 _check(rt!=0,"_thread_create");
+            } else {
+                CloseHandle(rt);    
             }
         }
     }

@@ -1,15 +1,54 @@
-**HDiffPatch**
-================
-[![release](https://img.shields.io/badge/release-v3.0.1-blue.svg)](https://github.com/sisong/HDiffPatch/releases)  [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/sisong/HDiffPatch/blob/master/LICENSE)  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/sisong/HDiffPatch/pulls)   
-[![Build Status](https://travis-ci.org/sisong/HDiffPatch.svg?branch=master)](https://travis-ci.org/sisong/HDiffPatch) [![Build status](https://ci.appveyor.com/api/projects/status/t9ow8dft8lt898cv/branch/master?svg=true)](https://ci.appveyor.com/project/sisong/hdiffpatch/branch/master)   
-a C\C++ library and command-line tools for binary data Diff & Patch; fast and create small delta/differential; support large files and directory(folder) and limit memory requires both diff & patch.    
+# [HDiffPatch](https://github.com/sisong/HDiffPatch)
+[![release](https://img.shields.io/badge/release-v4.0.0-blue.svg)](https://github.com/sisong/HDiffPatch/releases) 
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/sisong/HDiffPatch/blob/master/LICENSE) 
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://github.com/sisong/HDiffPatch/pulls)
+[![+issue Welcome](https://img.shields.io/github/issues-raw/sisong/HDiffPatch?color=green&label=%2Bissue%20welcome)](https://github.com/sisong/HDiffPatch/issues)   
+
+[![Build Status](https://travis-ci.org/sisong/HDiffPatch.svg?branch=master)](https://travis-ci.org/sisong/HDiffPatch) 
+[![Build status](https://ci.appveyor.com/api/projects/status/t9ow8dft8lt898cv/branch/master?svg=true)](https://ci.appveyor.com/project/sisong/hdiffpatch/branch/master)   
+
+a C\C++ library and command-line tools for Diff & Patch between binary files or directories(folder); cross-platform; run fast; create small delta/differential; support large files and limit memory requires when diff & patch.   
    
-( update Android Apk? Jar or Zip file diff & patch? try [ApkDiffPatch](https://github.com/sisong/ApkDiffPatch)! )   
 ( NOTE: This library does not deal with file metadata, such as file last wirte time, permissions, link file, etc... To this library, a file is just as a stream of bytes; You can extend this library or use other tools. )   
+( update Android Apk? Jar or Zip file diff & patch? try [ApkDiffPatch](https://github.com/sisong/ApkDiffPatch)!    
+ but ApkDiffPath can't be used in the Android app store, because it requires re-signing apk;   
+[sfpatcher](https://github.com/sisong/sfpatcher) like [archive-patcher](https://github.com/google/archive-patcher), is designed for Android app store, but patch is much faster than archive-patcher. )   
    
 ---
+## Releases/Binaries
+[Download from latest release](https://github.com/sisong/HDiffPatch/releases) : Command line app for Windows, Linux, MacOS; and .so patch lib for Android.     
+( release files build by projects in path `HDiffPatch/builds` )   
+
+## Builds
+`$ cd <dir>/HDiffPatch`   
+if on linux or macos, try :   
+`$ make LZMA=0 ZSTD=0 MD5=0`   
+or    
+```
+$ git clone https://github.com/sisong/lzma.git   ../lzma
+$ git clone https://github.com/facebook/zstd.git ../zstd
+$ git clone https://github.com/sisong/libmd5.git ../libmd5
+$ make
+```    
+   
+if on windows, befor compile `builds/vc/HDiffPatch.sln` by `Visual Studio` 
+```
+$ git clone https://github.com/sisong/lzma.git   ../lzma
+$ git clone https://github.com/facebook/zstd.git ../zstd
+$ git clone https://github.com/sisong/libmd5.git ../libmd5
+$ git clone https://github.com/sisong/zlib.git   ../zlib
+$ git clone https://github.com/sisong/bzip2.git  ../bzip2
+```
+   
+build libhpatchz.so for android:   
+* install Android NDK
+* `$ cd <dir>/HDiffPatch/builds/android_ndk_jni_mk`
+* `$ build_libs.sh`   (or `$ build_libs.bat`, then got \*.so files)
+* import file `com/github/sisong/HPatch.java` (from `HDiffPatch/builds/android_ndk_jni_mk/java/`) & .so files, java code can call the patch function in libhpatchz.so
+   
 ## diff command line usage:   
-diff    usage: **hdiffz** [options] **oldPath newPath outDiffFile**   
+diff     usage: **hdiffz** [options] **oldPath newPath outDiffFile**   
+compress usage: **hdiffz** [-c-...]  **"" newPath outDiffFile**   
 test    usage: **hdiffz**    -t     **oldPath newPath testDiffFile**   
 resave  usage: **hdiffz** [-c-...]  **diffFile outDiffFile**   
 get  manifest: **hdiffz** [-g#...] [-C-checksumType] **inputPath -M#outManifestTxtFile**   
@@ -28,9 +67,13 @@ memory options:
       requires O(oldFileSize*16/matchBlockSize+matchBlockSize*5)bytes of memory;
       matchBlockSize>=4, DEFAULT -s-64, recommended 16,32,48,1k,64k,1m etc...
 special options:
+  -SD[-stepSize]
+      create single compressed diffData, only need one decompress buffer
+      when patch, and support step by step patching when step by step downloading!
+      stepSize>=(1024*4), DEFAULT -SD-256k, recommended 64k,2m etc...
   -p-parallelThreadNumber
-    if parallelThreadNumber>1 then open multi-thread Parallel mode;
-    DEFAULT -p-4; requires more and more memory!
+      if parallelThreadNumber>1 then open multi-thread Parallel mode;
+      DEFAULT -p-4; requires more memory!
   -c-compressType[-compressLevel]
       set outDiffFile Compress type & level, DEFAULT uncompress;
       for resave diffFile,recompress diffFile to outDiffFile by new set;
@@ -40,7 +83,7 @@ special options:
         -c-pzlib[-{1..9}]               DEFAULT level 6
             support run by multi-thread parallel, fast!
             WARNING: code not compatible with it compressed by -c-zlib!
-              and code size may be larger than if it compressed by -c-zlib. 
+              and code size may be larger than if it compressed by -c-zlib.
         -c-bzip2[-{1..9}]               (or -bz2) DEFAULT level 9
         -c-pbzip2[-{1..9}]              (or -pbz2) DEFAULT level 8
             support run by multi-thread parallel, fast!
@@ -53,13 +96,16 @@ special options:
             dictSize can like 4096 or 4k or 4m or 128m etc..., DEFAULT 8m
             support run by multi-thread parallel, fast!
             WARNING: code not compatible with it compressed by -c-lzma!
+        -c-zstd[-{0..22}[-dictBits]]    DEFAULT level 20
+            dictBits can 10--31, DEFAULT 24.
+            support run by multi-thread parallel, fast!
   -C-checksumType
       set outDiffFile Checksum type for directory diff, DEFAULT -C-fadler64;
-      (if need checksum for diff between two files, add -D)
       support checksum type:
         -C-no                   no checksum
         -C-crc32
         -C-fadler64             DEFAULT
+        -C-md5
   -n-maxOpenFileNumber
       limit Number of open files at same time when stream directory diff;
       maxOpenFileNumber>=8, DEFAULT -n-48, the best limit value by different
@@ -78,23 +124,22 @@ special options:
       in general, new ignore list should is empty;
   -M#outManifestTxtFile
       create a Manifest file for inputPath; it is a text file, saved infos of
-      all files and directoriy list in inputPath; this file while be used in 
+      all files and directoriy list in inputPath; this file while be used in
       manifest diff, support re-checksum data by manifest diff;
       can be used to protect historical versions be modified!
   -M-old#oldManifestFile
       oldManifestFile is created from oldPath; if no oldPath not need -M-old;
   -M-new#newManifestFile
       newManifestFile is created from newPath;
-  -D  force run Directory diff between two files; DEFAULT (no -D) run 
+  -D  force run Directory diff between two files; DEFAULT (no -D) run
       directory diff need oldPath or newPath is directory.
   -d  Diff only, do't run patch check, DEFAULT run patch check.
-  -t  Test only, run patch check, patch(oldPath,testDiffFile)==newPath ? 
+  -t  Test only, run patch check, patch(oldPath,testDiffFile)==newPath ?
   -f  Force overwrite, ignore write path already exists;
       DEFAULT (no -f) not overwrite and then return error;
       if used -f and write path is exist directory, will always return error.
-  -o  DEPRECATED; Original diff, unsupport run with -s -c -C -D;
-      compatible with "diff_demo.cpp",
-      diffFile must patch by "patch_demo.c" or "hpatchz -o ..."
+  --patch
+      swap to hpatchz mode.
   -h or -?
       output Help info (this usage).
   -v  output Version info.
@@ -102,18 +147,23 @@ special options:
    
 ## patch command line usage:   
 patch usage: **hpatchz** [options] **oldPath diffFile outNewPath**   
+uncompress usage: **hpatchz** [options] **"" diffFile outNewPath**   
 create  SFX: **hpatchz** [-X-exe#selfExecuteFile] **diffFile -X#outSelfExtractArchive**   
 run     SFX: **selfExtractArchive** [options] **oldPath -X outNewPath**   
-extract SFX: **selfExtractArchive**    (same as: selfExtractArchive -f "" -X "./")
+extract SFX: **selfExtractArchive**   (same as: selfExtractArchive -f "" -X "./")
 ```
-  ( if oldPath is empty input parameter "" )
 memory options:
-  -m  oldPath all loaded into Memory;
-      requires (oldFileSize+ 4*decompress stream size)+O(1) bytes of memory.
-  -s[-cacheSize] 
+  -s[-cacheSize]
       DEFAULT -s-64m; oldPath loaded as Stream;
-      requires (cacheSize+ 4*decompress stream size)+O(1) bytes of memory;
       cacheSize can like 262144 or 256k or 512m or 2g etc....
+      requires (cacheSize + 4*decompress buffer size)+O(1) bytes of memory;
+      if diffFile is single compressed diffData, then requires
+        (oldFileSize+ stepSize + 1*decompress buffer size)+O(1) bytes of memory;
+        see: hdiffz -SD-stepSize option.
+  -m  oldPath all loaded into Memory;
+      requires (oldFileSize + 4*decompress buffer size)+O(1) bytes of memory;
+      if diffFile is single compressed diffData, then requires
+        (oldFileSize+ stepSize + 1*decompress buffer size)+O(1) bytes of memory.
 special options:
   -C-checksumSets
       set Checksum data for directory patch, DEFAULT -C-new-copy;
@@ -138,8 +188,6 @@ special options:
         if patch output file, will always return error;
         if patch output directory, will overwrite, but not delete
           needless existing files in directory.
-  -o  DEPRECATED; Original patch; compatible with "patch_demo.c",
-      diffFile must created by "diff_demo.cpp" or "hdiffz -o ..."
   -h or -?
       output Help info (this usage).
   -v  output Version info.
@@ -147,31 +195,39 @@ special options:
    
 ---
 ## library API usage:
-
-*  **create_diff**(newData,oldData,out diffData);
-   
+all **diff**&**patch** function in file: `libHDiffPatch/HDiff/diff.h` & `libHDiffPatch/HPatch/patch.h`   
+**dir_diff()** & **dir patch** in: `dirDiffPatch/dir_diff/dir_diff.h` & `dirDiffPatch/dir_patch/dir_patch.h`   
+### manual:
+* **create diff**(in newData,in oldData,out diffData);
    release the diffData for update oldData.  
-   `note:` create_diff() out **uncompressed** diffData;     
-    you can compressed it by yourself or use **create_compressed_diff()**/patch_decompress() create **compressed** diffData;   
-    if your file size very large or request faster and less memory requires, you can use **create_compressed_diff_stream()**/patch_decompress(). 
-   
-*  bool **patch**(out newData,oldData,diffData);
-   
+* **patch**(out newData,in oldData,in diffData);
    ok , get the newData. 
+### v1 API, uncompressed diffData:
+* **create_diff()**
+* **patch()**
+* **patch_stream()**
+* **patch_stream_with_cache()**
+### v2 API, compressed diffData:
+* **create_compressed_diff()**
+* **create_compressed_diff_stream()**
+* **resave_compressed_diff()**
+* **patch_decompress()**
+* **patch_decompress_with_cache()**
+* **patch_decompress_mem()**
+### v3 API, **diff**&**patch** between directories(folder):
+* **dir_diff()**
+* **TDirPatcher_\*** functions with **struct TDirPatcher()**
+### v4 API, single compressed diffData:
+* **create_single_compressed_diff()**
+* **create_single_compressed_diff_stream()**
+* **resave_single_compressed_diff()**
+* **patch_single_stream()**
+* **patch_single_stream_mem()**
+* **patch_single_compressed_diff()**
+* **patch_single_stream_diff()**
 
 ---
-*  **patch()** runs in O(oldSize+newSize) time , and requires (oldSize+newSize+diffSize)+O(1) bytes of memory;     
-   **patch_stream()** requires O(1) bytes of memory;   
-   **patch_decompress()** requires (4\*decompress stream size)+O(1) bytes of memory.   
-   
-   **create_diff()** & **create_compressed_diff()** runs in O(oldSize+newSize) time , and if oldSize \< 2G Byte then requires oldSize\*5+newSize+O(1) bytes of memory; if oldSize \>= 2G Byte then requires oldSize\*9+newSize+O(1) bytes of memory;  
-   **create_compressed_diff_stream()** requires O(oldSize\*16/kMatchBlockSize+kMatchBlockSize\*5) bytes of memory.
-
----
-*  **dir_diff()** & **dir patch APIs** read source code;   
-   
----
-### HDiffPatch vs BsDiff4.3:
+## HDiffPatch vs BsDiff:
 system: macOS10.12.6, compiler: xcode8.3.3 x64, CPU: i7 2.5G(turbo3.7G,6MB L3 cache),SSD Disk,Memroy:8G*2 DDR3 1600MHz   
    (purge file cache before every test)
 ```
@@ -179,7 +235,7 @@ HDiffPatch2.4 hdiffz run by: -m -c-bzip2-9|-c-lzma-7-4m|-c-zlib-9 oldFile newFil
               hpatchz run by: -m oldFile diffFile outNewFile
 BsDiff4.3 with bzip2 and all data in memory;
           (NOTE: when compiling BsDiff4.3-x64, suffix string index type int64 changed to int32, 
-            faster and memroy requires to be halved!)   
+            faster and memory requires to be halved!)   
 =======================================================================================================
          Program               Uncompressed Compressed Compressed  BsDiff             hdiffz
 (newVersion<--oldVersion)           (tar)     (bzip2)    (lzma)    (bzip2)    (bzip2   lzma     zlib)
@@ -213,7 +269,9 @@ Average        100%   28.9%    100%   71.5%      100%   52.3% 29.9% 21.3%      1
 =======================================================================================================
 ```
    
-### HDiffPatch vs xdelta3.1:
+## HDiffPatch vs xdelta:
+system: macOS10.12.6, compiler: xcode8.3.3 x64, CPU: i7 2.5G(turbo3.7G,6MB L3 cache),SSD Disk,Memroy:8G*2 DDR3 1600MHz   
+   (purge file cache before every test)
 ```
 HDiffPatch2.4 hdiffz run by: -s-128 -c-bzip2-9 oldFile newFile outDiffFile
               hpatchz run by: -s-4m oldFile diffFile outNewFile
@@ -238,8 +296,8 @@ Average           12.18%    7.81%     100%  79.0%     100%  15.5%      100%  169
               (fix 9.78%)
 =======================================================================================================
 
-HDiffPatch hdiffz run by: -s-64 -c-lzma-7-4m  oldFile newFile outDiffFile
-           hpatchz run by: -s-4m oldFile diffFile outNewFile
+HDiffPatch2.4 hdiffz run by: -s-64 -c-lzma-7-4m  oldFile newFile outDiffFile
+              hpatchz run by: -s-4m oldFile diffFile outNewFile
 xdelta3.1 diff run by: -S lzma -9 -s old_file new_file delta_file   
           patch run by: -d -s old_file delta_file decoded_new_file
           (NOTE fix: xdelta3.1 diff "gcc-src..." fail, add -B 530000000 diff ok,
@@ -263,5 +321,6 @@ Average           11.24%    6.44%     100%  88.9%     100%  20.0%      100%  151
 ```
   
 ---
-by housisong@gmail.com  
+## Contact
+housisong@hotmail.com  
 

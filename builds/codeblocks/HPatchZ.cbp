@@ -22,10 +22,15 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-fomit-frame-pointer" />
-					<Add option="-O3" />
+					<Add option="-Os" />
+					<Add option="-Wno-error=format-security" />
+					<Add option="-fvisibility=hidden" />
+					<Add option="-ffunction-sections -fdata-sections" />
+					<Add option="-ffat-lto-objects -flto" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-Wl,--gc-sections" />
 				</Linker>
 			</Target>
 			<Target title="Release_x86">
@@ -34,22 +39,30 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-march=i386" />
 					<Add option="-fomit-frame-pointer" />
-					<Add option="-O3" />
+					<Add option="-Os" />
 					<Add option="-m32" />
+					<Add option="-Wno-error=format-security" />
+					<Add option="-fvisibility=hidden" />
+					<Add option="-ffunction-sections -fdata-sections" />
+					<Add option="-ffat-lto-objects -flto" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-m32" />
+					<Add option="-Wl,--gc-sections" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add option="-D_LARGEFILE_SOURCE" />
 			<Add option="-D_FILE_OFFSET_BITS=64" />
+			<Add option="-D_ChecksumPlugin_md5" />
 			<Add directory="../../../lzma/C/" />
+			<Add directory="../../../zstd/lib" />
+			<Add directory="../../../libmd5" />
 		</Compiler>
 		<Unit filename="../../../bzip2/blocksort.c">
 			<Option compilerVar="CC" />
@@ -73,6 +86,10 @@
 		<Unit filename="../../../bzip2/randtable.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../../libmd5/md5.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../libmd5/md5.h" />
 		<Unit filename="../../../lzma/C/Lzma2Dec.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -101,10 +118,62 @@
 		<Unit filename="../../../zlib/zutil.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../../zstd/lib/common/bitstream.h" />
+		<Unit filename="../../../zstd/lib/common/compiler.h" />
+		<Unit filename="../../../zstd/lib/common/cpu.h" />
+		<Unit filename="../../../zstd/lib/common/debug.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../zstd/lib/common/debug.h" />
+		<Unit filename="../../../zstd/lib/common/entropy_common.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../zstd/lib/common/error_private.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../zstd/lib/common/error_private.h" />
+		<Unit filename="../../../zstd/lib/common/fse.h" />
+		<Unit filename="../../../zstd/lib/common/fse_decompress.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../zstd/lib/common/huf.h" />
+		<Unit filename="../../../zstd/lib/common/mem.h" />
+		<Unit filename="../../../zstd/lib/common/xxhash.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../zstd/lib/common/xxhash.h" />
+		<Unit filename="../../../zstd/lib/common/zstd_common.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../zstd/lib/common/zstd_deps.h" />
+		<Unit filename="../../../zstd/lib/common/zstd_internal.h" />
+		<Unit filename="../../../zstd/lib/common/zstd_trace.h" />
+		<Unit filename="../../../zstd/lib/decompress/huf_decompress.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../zstd/lib/decompress/zstd_ddict.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../zstd/lib/decompress/zstd_ddict.h" />
+		<Unit filename="../../../zstd/lib/decompress/zstd_decompress.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../zstd/lib/decompress/zstd_decompress_block.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../zstd/lib/decompress/zstd_decompress_block.h" />
+		<Unit filename="../../../zstd/lib/decompress/zstd_decompress_internal.h" />
+		<Unit filename="../../../zstd/lib/zstd.h" />
 		<Unit filename="../../dirDiffPatch/dir_patch/dir_patch.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../dirDiffPatch/dir_patch/dir_patch.h" />
+		<Unit filename="../../dirDiffPatch/dir_patch/dir_patch_tools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../dirDiffPatch/dir_patch/new_dir_output.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../dirDiffPatch/dir_patch/new_stream.c">
 			<Option compilerVar="CC" />
 		</Unit>
