@@ -149,7 +149,7 @@ hpatch_BOOL hpatch_coverList_close(hpatch_TCoverList* coverList) {
 //patch singleCompressedDiff with listener
 //	used (stepMemSize memory) + (I/O cache memory) + (decompress buffer*1)
 //  every byte in singleCompressedDiff will only be read once in order
-//  singleCompressedDiff create by create_single_compressed_diff()
+//  singleCompressedDiff create by create_single_compressed_diff() or create_single_compressed_diff_stream()
 //  you can download&patch diffData at the same time, without saving it to disk
 //  same as call getSingleCompressedDiffInfo() + listener->onDiffInfo() + patch_single_compressed_diff()
 hpatch_BOOL patch_single_stream(sspatch_listener_t* listener, //call back when got diffInfo
@@ -159,7 +159,6 @@ hpatch_BOOL patch_single_stream(sspatch_listener_t* listener, //call back when g
                                 hpatch_StreamPos_t  diffInfo_pos, //default 0, begin pos in singleCompressedDiff
                                 sspatch_coversListener_t* coversListener //default NULL, call by on got covers
                                 );
-// patch_single_stream_by rename to patch_single_stream
 static hpatch_inline hpatch_BOOL
     patch_single_stream_mem(sspatch_listener_t* listener,
                             unsigned char* out_newData,unsigned char* out_newData_end,
@@ -174,10 +173,9 @@ static hpatch_inline hpatch_BOOL
         mem_as_hStreamInput(&diffStream,diff,diff_end);
         return patch_single_stream(listener,&out_newStream,&oldStream,&diffStream,0,coversListener);
     }
-// patch_single_stream_by_mem rename to patch_single_stream_mem
 
 //get singleCompressedDiff info
-//  singleCompressedDiff create by create_single_compressed_diff()
+//  singleCompressedDiff create by create_single_compressed_diff() or create_single_compressed_diff_stream()
 hpatch_BOOL getSingleCompressedDiffInfo(hpatch_singleCompressedDiffInfo* out_diffInfo,
                                         const hpatch_TStreamInput*  singleCompressedDiff,   //sequential read
                                         hpatch_StreamPos_t diffInfo_pos//default 0, begin pos in singleCompressedDiff
@@ -195,7 +193,7 @@ hpatch_inline static hpatch_BOOL
 //	used (stepMemSize memory) + (I/O cache memory) + (decompress buffer*1)
 //	note: (I/O cache memory) >= hpatch_kStreamCacheSize*3
 //  temp_cache_end-temp_cache == stepMemSize + (I/O cache memory)
-//  singleCompressedDiff create by create_single_compressed_diff()
+//  singleCompressedDiff create by create_single_compressed_diff() or create_single_compressed_diff_stream()
 //  decompressPlugin can null when no compressed data in singleCompressedDiff
 //  same as call compressed_stream_as_uncompressed() + patch_single_stream_diff()
 hpatch_BOOL patch_single_compressed_diff(const hpatch_TStreamOutput* out_newData,          //sequential write
@@ -219,6 +217,7 @@ hpatch_BOOL patch_single_stream_diff(const hpatch_TStreamOutput*  out_newData,  
                                      const hpatch_TStreamInput*   oldData,              //random read
                                      const hpatch_TStreamInput*   uncompressedDiffData, //sequential read
                                      hpatch_StreamPos_t           diffData_pos,//diffData begin pos in uncompressedDiffData
+                                     hpatch_StreamPos_t           diffData_posEnd,//diffData end pos in uncompressedDiffData
                                      hpatch_StreamPos_t coverCount,hpatch_size_t stepMemSize,
                                      unsigned char* temp_cache,unsigned char* temp_cache_end,
                                      sspatch_coversListener_t* coversListener);

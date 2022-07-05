@@ -21,15 +21,16 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-Os" />
+					<Add option="-O3" />
 					<Add option="-Wno-error=format-security" />
 					<Add option="-fvisibility=hidden -fvisibility-inlines-hidden" />
 					<Add option="-ffunction-sections -fdata-sections" />
 					<Add option="-ffat-lto-objects -flto" />
+					<Add option="-DNDEBUG" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-Wl,--gc-sections" />
+					<Add option="-Wl,--gc-sections,--as-needed" />
 				</Linker>
 			</Target>
 			<Target title="Release_x86">
@@ -39,17 +40,18 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-march=i586" />
-					<Add option="-Os" />
+					<Add option="-O3" />
 					<Add option="-m32" />
 					<Add option="-Wno-error=format-security" />
 					<Add option="-fvisibility=hidden -fvisibility-inlines-hidden" />
 					<Add option="-ffunction-sections -fdata-sections" />
 					<Add option="-ffat-lto-objects -flto" />
+					<Add option="-DNDEBUG" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-m32" />
-					<Add option="-Wl,--gc-sections" />
+					<Add option="-Wl,--gc-sections,--as-needed" />
 				</Linker>
 			</Target>
 		</Build>
@@ -61,6 +63,7 @@
 			<Add option="-D_IS_USED_PTHREAD=1" />
 			<Add option="-D_ChecksumPlugin_md5" />
 			<Add option="-DZSTD_MULTITHREAD=1" />
+			<Add option="-DZSTD_DISABLE_ASM" />
 			<Add directory="../../../lzma/C/" />
 			<Add directory="../../../zstd/lib" />
 			<Add directory="../../../libmd5" />
@@ -97,10 +100,16 @@
 		<Unit filename="../../../lzma/C/Alloc.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../../lzma/C/CpuArch.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../../lzma/C/LzFind.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../lzma/C/LzFindMt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../lzma/C/LzFindOpt.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../../lzma/C/Lzma2Dec.c">
@@ -266,6 +275,10 @@
 		</Unit>
 		<Unit filename="../../../zstd/lib/decompress/zstd_decompress_block.h" />
 		<Unit filename="../../../zstd/lib/decompress/zstd_decompress_internal.h" />
+		<Unit filename="../../bsdiff_wrapper/bsdiff_wrapper.cpp" />
+		<Unit filename="../../bsdiff_wrapper/bspatch_wrapper.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../compress_parallel.cpp" />
 		<Unit filename="../../compress_parallel.h" />
 		<Unit filename="../../dirDiffPatch/dir_diff/dir_diff.cpp" />
@@ -304,6 +317,7 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../libHDiffPatch/HDiff/diff.cpp" />
+		<Unit filename="../../libHDiffPatch/HDiff/match_block.cpp" />
 		<Unit filename="../../libHDiffPatch/HDiff/private_diff/bytes_rle.cpp" />
 		<Unit filename="../../libHDiffPatch/HDiff/private_diff/compress_detect.cpp" />
 		<Unit filename="../../libHDiffPatch/HDiff/private_diff/libdivsufsort/divsufsort.c">
@@ -318,6 +332,9 @@
 		<Unit filename="../../libHDiffPatch/HDiff/private_diff/limit_mem_diff/digest_matcher.cpp" />
 		<Unit filename="../../libHDiffPatch/HDiff/private_diff/limit_mem_diff/stream_serialize.cpp" />
 		<Unit filename="../../libHDiffPatch/HDiff/private_diff/suffix_string.cpp" />
+		<Unit filename="../../libHDiffPatch/HPatchLite/hpatch_lite.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../libHDiffPatch/HPatch/patch.c">
 			<Option compilerVar="CC" />
 		</Unit>
